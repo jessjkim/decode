@@ -212,6 +212,13 @@ h3 {
   gap: 24px;
 }
 
+.summary-bar {
+  background: var(--mist);
+  padding: 14px 16px;
+  border-radius: 14px;
+  color: var(--ink-soft);
+}
+
 .card {
   background: white;
   padding: 22px;
@@ -267,6 +274,18 @@ h3 {
   line-height: 1.5;
 }
 
+.plain-list {
+  display: grid;
+  gap: 8px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.helper {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
 .similar {
   display: flex;
   flex-wrap: wrap;
@@ -302,6 +321,20 @@ h3 {
   text-transform: uppercase;
   color: var(--sage);
   font-weight: 600;
+}
+
+.tech-toggle {
+  border: none;
+  background: transparent;
+  color: var(--sage);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+.tech-section {
+  margin-top: 8px;
 }
 
 @keyframes float-in {
