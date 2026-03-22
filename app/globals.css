@@ -197,6 +197,15 @@ h3 {
   color: var(--ink-soft);
 }
 
+.error {
+  color: #8f2d2d;
+  font-weight: 600;
+}
+
+.empty {
+  color: var(--ink-soft);
+}
+
 .results__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -269,6 +278,30 @@ h3 {
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 0.85rem;
+}
+
+.rvu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.rvu-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--mist);
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+}
+
+.rvu-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 600;
 }
 
 @keyframes float-in {

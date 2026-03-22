@@ -1,80 +1,50 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-const CPT_DATA = [
-  {
-    code: "28238",
-    title: "Partial excision of foot bone",
-    summary: "Surgical removal of part of a foot bone, often to relieve pain or correct deformity.",
-    typicalSetting: "Outpatient surgery center or hospital outpatient.",
-    questions: [
-      "Is imaging required before deciding on this procedure?",
-      "What are the conservative alternatives?"
-    ],
-    similar: ["28230", "28232"]
-  },
-  {
-    code: "27687",
-    title: "Repair of leg tendon",
-    summary: "Repair of a tendon in the lower leg or ankle region.",
-    typicalSetting: "Outpatient surgery with regional or general anesthesia.",
-    questions: [
-      "Is this repair primary or a revision?",
-      "What is the expected recovery timeline?"
-    ],
-    similar: ["27680", "27695"]
-  },
-  {
-    code: "28300",
-    title: "Osteotomy, midfoot",
-    summary: "A controlled cut in a midfoot bone to realign or correct structure.",
-    typicalSetting: "Outpatient surgery, often with post-op immobilization.",
-    questions: [
-      "Will hardware be placed and removed later?",
-      "How long will non-weight-bearing last?"
-    ],
-    similar: ["28306", "28307"]
-  },
-  {
-    code: "27658",
-    title: "Fascia release, leg",
-    summary: "Release of tight fascia in the lower leg to reduce pain or pressure.",
-    typicalSetting: "Outpatient surgery with short recovery visit.",
-    questions: [
-      "Is this for chronic pain or acute compartment symptoms?",
-      "What are the risks of recurrence?"
-    ],
-    similar: ["27654", "27652"]
-  },
-  {
-    code: "28304",
-    title: "Osteotomy, toe",
-    summary: "Realignment of a toe bone using a precise bone cut.",
-    typicalSetting: "Outpatient surgery, typically a short procedure.",
-    questions: [
-      "Will pins or screws be used?",
-      "When can normal footwear resume?"
-    ],
-    similar: ["28306", "28309"]
-  }
-];
+const SAMPLE_CODES = ["28238", "27687", "28300", "27658", "28304"];
+
+type PfsRecord = {
+  code: string;
+  description: string | null;
+  statusCode: string | null;
+  paymentIndicator: string | null;
+  workRvu: number | null;
+  nonFacilityPeRvu: number | null;
+  facilityPeRvu: number | null;
+  malpracticeRvu: number | null;
+  totalNonFacilityRvu: number | null;
+  totalFacilityRvu: number | null;
+  pcTcIndicator: string | null;
+  globalDays: string | null;
+};
 
 export default function Home() {
   const [query, setQuery] = useState("");
+  const [result, setResult] = useState<PfsRecord | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const results = useMemo(() => {
-    const trimmed = query.trim();
-    if (!trimmed) return CPT_DATA;
-    const normalized = trimmed.toLowerCase();
-    return CPT_DATA.filter((item) => {
-      return (
-        item.code.includes(normalized) ||
-        item.title.toLowerCase().includes(normalized) ||
-        item.summary.toLowerCase().includes(normalized)
-      );
-    });
-  }, [query]);
+  const fetchCode = async (code: string) => {
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const response = await fetch(`/api/cpt?code=${encodeURIComponent(trimmed)}`);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error ?? "Unable to fetch CPT data.");
+      }
+      const data = await response.json();
+      setResult(data.record);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="page">
@@ -93,23 +63,28 @@ export default function Home() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
-            <button type="button">Explain</button>
+            <button type="button" onClick={() => fetchCode(query)}>
+              {loading ? "Loading..." : "Explain"}
+            </button>
           </div>
           <div className="chip-row">
-            {["28238", "27687", "28300", "27658", "28304"].map((code) => (
+            {SAMPLE_CODES.map((code) => (
               <button
                 key={code}
                 className="chip"
                 type="button"
-                onClick={() => setQuery(code)}
+                onClick={() => {
+                  setQuery(code);
+                  fetchCode(code);
+                }}
               >
                 {code}
               </button>
             ))}
           </div>
           <p className="disclaimer">
-            Demo dataset for preview only. Connect real data sources to replace
-            these examples.
+            Data source: CMS 2025 Physician Fee Schedule RVU file (October
+            release).
           </p>
         </div>
         <div className="hero__panel">
@@ -134,40 +109,59 @@ export default function Home() {
       <section className="results">
         <div className="results__header">
           <h2>Code results</h2>
-          <p>{results.length} matches</p>
+          <p>{result ? "1 match" : "No results yet"}</p>
         </div>
-        <div className="results__grid">
-          {results.map((item) => (
-            <article key={item.code} className="card">
+        {error ? <p className="error">{error}</p> : null}
+        {result ? (
+          <div className="results__grid">
+            <article className="card">
               <div className="card__header">
-                <span className="code">{item.code}</span>
-                <span className="tag">Common</span>
+                <span className="code">{result.code}</span>
+                <span className="tag">CMS PFS</span>
               </div>
-              <h3>{item.title}</h3>
-              <p className="summary">{item.summary}</p>
+              <h3>{result.description ?? "No description available"}</h3>
               <div className="detail">
-                <span className="label">Typical setting</span>
-                <span>{item.typicalSetting}</span>
-              </div>
-              <div className="detail">
-                <span className="label">Questions to ask</span>
-                <ul>
-                  {item.questions.map((question) => (
-                    <li key={question}>{question}</li>
-                  ))}
-                </ul>
+                <span className="label">Status code</span>
+                <span>{result.statusCode ?? "—"}</span>
               </div>
               <div className="detail">
-                <span className="label">Similar codes</span>
-                <div className="similar">
-                  {item.similar.map((code) => (
-                    <span key={code}>{code}</span>
-                  ))}
+                <span className="label">Global days</span>
+                <span>{result.globalDays ?? "—"}</span>
+              </div>
+              <div className="detail">
+                <span className="label">RVUs</span>
+                <div className="rvu-grid">
+                  <div>
+                    <span className="rvu-label">Work</span>
+                    <span>{result.workRvu ?? "—"}</span>
+                  </div>
+                  <div>
+                    <span className="rvu-label">PE (non-fac)</span>
+                    <span>{result.nonFacilityPeRvu ?? "—"}</span>
+                  </div>
+                  <div>
+                    <span className="rvu-label">PE (fac)</span>
+                    <span>{result.facilityPeRvu ?? "—"}</span>
+                  </div>
+                  <div>
+                    <span className="rvu-label">MP</span>
+                    <span>{result.malpracticeRvu ?? "—"}</span>
+                  </div>
+                  <div>
+                    <span className="rvu-label">Total (non-fac)</span>
+                    <span>{result.totalNonFacilityRvu ?? "—"}</span>
+                  </div>
+                  <div>
+                    <span className="rvu-label">Total (fac)</span>
+                    <span>{result.totalFacilityRvu ?? "—"}</span>
+                  </div>
                 </div>
               </div>
             </article>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <p className="empty">Enter a CPT code to see CMS data.</p>
+        )}
       </section>
     </main>
   );
