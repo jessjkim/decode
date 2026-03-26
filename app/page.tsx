@@ -19,6 +19,18 @@ type PfsRecord = {
   globalDays: string | null;
 };
 
+type AgentSummary = {
+  summary: string;
+  questions: string[];
+  cached: boolean;
+};
+
+type CptResult = {
+  record: PfsRecord;
+  summary: string;
+  questions: string[];
+};
+
 const explainGlobalDays = (days: string | null) => {
   if (!days) return "Not available in the CMS file.";
   if (days === "000") return "Minor procedure; follow-up care is generally bundled for the same day only.";
@@ -31,20 +43,9 @@ const explainGlobalDays = (days: string | null) => {
   return "See payer rules for this global period.";
 };
 
-const buildPlainLanguage = (record: PfsRecord) => {
-  const description = record.description
-    ? record.description.toLowerCase()
-    : "this procedure";
-  return [
-    `CMS describes this code as “${record.description ?? "Not listed"}.”`,
-    `This is a billing label used when care involves ${description}.`,
-    "Ask your provider what exact service was performed and how it relates to your diagnosis."
-  ];
-};
-
 export default function Home() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<PfsRecord[]>([]);
+  const [results, setResults] = useState<CptResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -67,13 +68,35 @@ export default function Home() {
     try {
       const responses = await Promise.all(
         codes.map(async (code) => {
-          const response = await fetch(`/api/cpt?code=${encodeURIComponent(code)}`);
-          if (!response.ok) {
-            const data = await response.json();
+          const [cptResponse, summaryResponse] = await Promise.all([
+            fetch(`/api/cpt?code=${encodeURIComponent(code)}`),
+            fetch("/api/agent/summary", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ code })
+            })
+          ]);
+
+          if (!cptResponse.ok) {
+            const data = await cptResponse.json();
             throw new Error(data.error ?? `Unable to fetch ${code}.`);
           }
-          const data = await response.json();
-          return data.record as PfsRecord;
+
+          if (!summaryResponse.ok) {
+            const data = await summaryResponse.json();
+            throw new Error(data.error ?? `Unable to summarize ${code}.`);
+          }
+
+          const cptData = await cptResponse.json();
+          const summaryData = (await summaryResponse.json()) as AgentSummary;
+
+          return {
+            record: cptData.record as PfsRecord,
+            summary: summaryData.summary,
+            questions: summaryData.questions
+          };
         })
       );
       setResults(responses);
@@ -150,13 +173,6 @@ export default function Home() {
               <li>Get a clear, consumer-friendly summary.</li>
             </ol>
           </div>
-          <div className="panel-card highlight">
-            <p className="panel-title">AI agent tasks</p>
-            <p>
-              Extract codes, retrieve policy context, summarize, and suggest
-              questions to ask.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -177,67 +193,67 @@ export default function Home() {
         {results.length ? (
           <div className="results__grid">
             {results.map((result) => (
-              <article key={result.code} className="card">
+              <article key={result.record.code} className="card">
                 <div className="card__header">
-                  <span className="code">{result.code}</span>
+                  <span className="code">{result.record.code}</span>
                   <span className="tag">CMS PFS</span>
                 </div>
-                <h3>{result.description ?? "No description available"}</h3>
+                <h3>{result.record.description ?? "No description available"}</h3>
                 <div className="detail">
                   <span className="label">Description</span>
                   <div className="plain-list">
-                    {buildPlainLanguage(result).map((line) => (
-                      <p key={line}>{line}</p>
-                    ))}
+                    <p>{result.summary}</p>
                   </div>
                 </div>
                 <div className="detail">
                   <span className="label">Follow-up window</span>
-                  <span>{result.globalDays ?? "—"} days</span>
-                  <span className="helper">{explainGlobalDays(result.globalDays)}</span>
+                  <span>{result.record.globalDays ?? "—"} days</span>
+                  <span className="helper">{explainGlobalDays(result.record.globalDays)}</span>
                 </div>
                 <div className="detail">
                   <span className="label">Questions to ask</span>
                   <ul>
-                    <li>What part of my visit does this code represent?</li>
-                    <li>Is this bundled with other services in the bill?</li>
-                    <li>What follow-up care is expected for this code?</li>
+                    {result.questions.map((question) => (
+                      <li key={question}>{question}</li>
+                    ))}
                   </ul>
                 </div>
                 <button
                   type="button"
                   className="tech-toggle"
-                  onClick={() => toggleExpanded(result.code)}
+                  onClick={() => toggleExpanded(result.record.code)}
                 >
-                  {expanded.has(result.code) ? "Hide technical details" : "Show technical details"}
+                  {expanded.has(result.record.code)
+                    ? "Hide technical details"
+                    : "Show technical details"}
                 </button>
-                {expanded.has(result.code) ? (
+                {expanded.has(result.record.code) ? (
                   <div className="detail tech-section">
                     <span className="label">Technical details (RVUs)</span>
                     <div className="rvu-grid">
                       <div>
                         <span className="rvu-label">Work</span>
-                        <span>{result.workRvu ?? "—"}</span>
+                        <span>{result.record.workRvu ?? "—"}</span>
                       </div>
                       <div>
                         <span className="rvu-label">PE (non-fac)</span>
-                        <span>{result.nonFacilityPeRvu ?? "—"}</span>
+                        <span>{result.record.nonFacilityPeRvu ?? "—"}</span>
                       </div>
                       <div>
                         <span className="rvu-label">PE (fac)</span>
-                        <span>{result.facilityPeRvu ?? "—"}</span>
+                        <span>{result.record.facilityPeRvu ?? "—"}</span>
                       </div>
                       <div>
                         <span className="rvu-label">MP</span>
-                        <span>{result.malpracticeRvu ?? "—"}</span>
+                        <span>{result.record.malpracticeRvu ?? "—"}</span>
                       </div>
                       <div>
                         <span className="rvu-label">Total (non-fac)</span>
-                        <span>{result.totalNonFacilityRvu ?? "—"}</span>
+                        <span>{result.record.totalNonFacilityRvu ?? "—"}</span>
                       </div>
                       <div>
                         <span className="rvu-label">Total (fac)</span>
-                        <span>{result.totalFacilityRvu ?? "—"}</span>
+                        <span>{result.record.totalFacilityRvu ?? "—"}</span>
                       </div>
                     </div>
                   </div>

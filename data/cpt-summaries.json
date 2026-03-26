@@ -1,0 +1,99 @@
+{
+  "summaries": {
+    "27658": {
+      "code": "27658",
+      "summary": "CMS describes this code as “Repair of leg tendon each.” [1] This is a billing label for care tied to that service; your provider can explain the exact steps performed. [1] Ask how it connects to your diagnosis and what follow-up care is expected. [1]",
+      "questions": [
+        "What exact service does this code represent for my visit? [1]",
+        "Is any part of this care bundled into another code? [1]",
+        "What follow-up care is usually expected for this service? [1]"
+      ],
+      "sourceHash": "320ceef180d668c24315fb1d6fbf2c393db880535846b467582169168e9992c2",
+      "updatedAt": "2026-03-22T04:06:03.543Z",
+      "sources": [
+        {
+          "id": "cms-pfs-2025",
+          "title": "CMS PFS 2025 RVU file for CPT 27658",
+          "url": "https://www.cms.gov/files/zip/rvu25d.zip",
+          "excerpt": "CMS short descriptor: Repair of leg tendon each. Global days: 090."
+        }
+      ]
+    },
+    "27687": {
+      "code": "27687",
+      "summary": "CMS describes this code as “Revision of calf tendon.” [1] This is a billing label for care tied to that service; your provider can explain the exact steps performed. [1] Ask how it connects to your diagnosis and what follow-up care is expected. [1]",
+      "questions": [
+        "What exact service does this code represent for my visit? [1]",
+        "Is any part of this care bundled into another code? [1]",
+        "What follow-up care is usually expected for this service? [1]"
+      ],
+      "sourceHash": "19840866a966cf19111f5dadabdba9c33b222fdab6b35de265a09b2dab3f5037",
+      "updatedAt": "2026-03-22T03:59:33.716Z",
+      "sources": [
+        {
+          "id": "cms-pfs-2025",
+          "title": "CMS PFS 2025 RVU file for CPT 27687",
+          "url": "https://www.cms.gov/files/zip/rvu25d.zip",
+          "excerpt": "CMS short descriptor: Revision of calf tendon. Global days: 090."
+        }
+      ]
+    },
+    "28238": {
+      "code": "28238",
+      "summary": "CMS describes this code as “Revision of foot tendon.” [1] This is a billing label for care tied to that service; your provider can explain the exact steps performed. [1] Ask how it connects to your diagnosis and what follow-up care is expected. [1]",
+      "questions": [
+        "What exact service does this code represent for my visit? [1]",
+        "Is any part of this care bundled into another code? [1]",
+        "What follow-up care is usually expected for this service? [1]"
+      ],
+      "sourceHash": "653ef9b32a525b8efd704dd69a8bce9ac43fcb373c648185f007e0e539f91a40",
+      "updatedAt": "2026-03-22T04:05:41.529Z",
+      "sources": [
+        {
+          "id": "cms-pfs-2025",
+          "title": "CMS PFS 2025 RVU file for CPT 28238",
+          "url": "https://www.cms.gov/files/zip/rvu25d.zip",
+          "excerpt": "CMS short descriptor: Revision of foot tendon. Global days: 090."
+        }
+      ]
+    },
+    "28300": {
+      "code": "28300",
+      "summary": "CMS describes this code as “Incision of heel bone.” [1] This is a billing label for care tied to that service; your provider can explain the exact steps performed. [1] Ask how it connects to your diagnosis and what follow-up care is expected. [1]",
+      "questions": [
+        "What exact service does this code represent for my visit? [1]",
+        "Is any part of this care bundled into another code? [1]",
+        "What follow-up care is usually expected for this service? [1]"
+      ],
+      "sourceHash": "d94eedf8419f8c4e035202cac0fc85599e1933b8bb90429d9d674bb933e17bac",
+      "updatedAt": "2026-03-22T04:06:02.560Z",
+      "sources": [
+        {
+          "id": "cms-pfs-2025",
+          "title": "CMS PFS 2025 RVU file for CPT 28300",
+          "url": "https://www.cms.gov/files/zip/rvu25d.zip",
+          "excerpt": "CMS short descriptor: Incision of heel bone. Global days: 090."
+        }
+      ]
+    },
+    "28304": {
+      "code": "28304",
+      "summary": "CMS describes this code as “Incision of midfoot bones.” [1] This is a billing label for care tied to that service; your provider can explain the exact steps performed. [1] Ask how it connects to your diagnosis and what follow-up care is expected. [1]",
+      "questions": [
+        "What exact service does this code represent for my visit? [1]",
+        "Is any part of this care bundled into another code? [1]",
+        "What follow-up care is usually expected for this service? [1]"
+      ],
+      "sourceHash": "24a499a5d1007b6a334213b47289e25de2ec8a9ef2fa74a12a59a0748f70d943",
+      "updatedAt": "2026-03-22T04:06:02.830Z",
+      "sources": [
+        {
+          "id": "cms-pfs-2025",
+          "title": "CMS PFS 2025 RVU file for CPT 28304",
+          "url": "https://www.cms.gov/files/zip/rvu25d.zip",
+          "excerpt": "CMS short descriptor: Incision of midfoot bones. Global days: 090."
+        }
+      ]
+    }
+  }
+}
